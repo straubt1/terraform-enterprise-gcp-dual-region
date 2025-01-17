@@ -6,7 +6,7 @@ resource "google_compute_network" "vpc" {
   name                            = "${local.name_prefix}-vpc"
   routing_mode                    = "REGIONAL"
   auto_create_subnetworks         = false
-  delete_default_routes_on_create = true # Verify this should be true
+  delete_default_routes_on_create = false
 }
 
 resource "google_compute_subnetwork" "subnet" {
@@ -67,6 +67,7 @@ resource "google_compute_firewall" "lb_health_checks" {
   network       = google_compute_network.vpc.self_link
   direction     = "INGRESS"
   source_ranges = var.cidr_allow_ingress_lb_health_probes
+  # added 0.0.0.0/0 to allow for testing in the GCP console
 
   allow {
     protocol = "tcp"

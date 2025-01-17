@@ -3,9 +3,15 @@ variable "project_id" {
   description = "ID of GCP project to create resources in."
 }
 
-variable "region" {
+
+variable "primary_region" {
   type        = string
-  description = "Region to create resource in."
+  description = "Primary region for resources."
+}
+
+variable "secondary_region" {
+  type        = string
+  description = "Secondary region for resources."
 }
 
 variable "namespace" {
