@@ -25,12 +25,6 @@ variable "cidr_allow_ingress_lb_health_probes" {
   default     = ["130.211.0.0/22", "35.191.0.0/16", "209.85.152.0/22", "209.85.204.0/22"]
 }
 
-variable "cidr_allow_ingress_bastion" {
-  type        = list(string)
-  description = "List of source CIDR ranges to allow inbound to VPC on port 22 (SSH) to access the bastion host."
-  default     = []
-}
-
 variable "cidr_allow_ingress_https" {
   type        = list(string)
   description = "List of source CIDR ranges of users/clients/VCS to allow inbound to VPC on port 443 (HTTPS) for TFE application traffic."

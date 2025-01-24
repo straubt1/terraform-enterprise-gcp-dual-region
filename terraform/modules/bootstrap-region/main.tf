@@ -79,7 +79,7 @@ resource "google_compute_firewall" "bastion_ssh" {
   name          = "${local.name_prefix}-vpc-fw-ssh"
   network       = google_compute_network.vpc.name
   direction     = "INGRESS"
-  source_ranges = var.cidr_allow_ingress_bastion
+  source_ranges = var.cidr_allow_ingress_https
   target_tags   = ["tfe-bastion"]
 
   allow {
@@ -92,7 +92,7 @@ resource "google_compute_firewall" "bastion_proxy" {
   name          = "${local.name_prefix}-vpc-fw-proxy"
   network       = google_compute_network.vpc.name
   direction     = "INGRESS"
-  source_ranges = var.cidr_allow_ingress_bastion
+  source_ranges = var.cidr_allow_ingress_https
   target_tags   = ["tfe-bastion"]
 
   allow {

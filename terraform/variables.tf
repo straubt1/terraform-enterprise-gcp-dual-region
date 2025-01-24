@@ -14,6 +14,16 @@ variable "secondary_region" {
   description = "Secondary region for resources."
 }
 
+variable "primary_network_cidr" {
+  type        = string
+  description = "CIDR range of VPC subnetwork to create in primary region."
+}
+
+variable "secondary_network_cidr" {
+  type        = string
+  description = "CIDR range of VPC subnetwork to create in secondary region."
+}
+
 variable "namespace" {
   type        = string
   description = "Friendly name prefix for uniquely naming resources."
@@ -30,6 +40,11 @@ variable "tfe_license_file" {
   description = "Location of the TFE License file on disk."
 }
 
+variable "domain" {
+  type        = string
+  description = "The domain to use for the TFE installation (ex. company.com)."
+}
+
 variable "tfe_fqdn" {
   description = "the FQDN for TFE (ex. tfe.company.com)"
 }
@@ -38,9 +53,9 @@ variable "cert_email" {
   description = "The email to use when generating TLS certs"
 }
 
-# variable "dns_zone_name" {
-#   description = "GCP DNS Zone Name (example: doormat-accountid)"
-# }
+variable "dns_zone_name" {
+  description = "GCP DNS Zone Name (example: doormat-accountid)"
+}
 
 variable "common_labels" {
   type        = map(string)
