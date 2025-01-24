@@ -51,10 +51,14 @@ resource "google_sql_database" "tfe" {
   instance = google_sql_database_instance.tfe.name
 }
 
+
+data "google_secret_manager_secret_version" "tfe_database_password" {
+  secret = "tfe-database-password"
+}
 resource "google_sql_user" "tfe" {
   name     = var.tfe_database.user
   instance = google_sql_database_instance.tfe.name
-  password = google_secret_manager_secret_version.tfe_database_password.secret_data
+  password = data.google_secret_manager_secret_version.tfe_database_password.secret_data
 }
 
 

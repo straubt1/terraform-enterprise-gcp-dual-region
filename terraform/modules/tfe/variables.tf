@@ -3,12 +3,6 @@ variable "project_id" {
   description = "ID of GCP project to create resources in."
 }
 
-# variable "region" {
-#   type        = string
-#   description = "Region to create resource in."
-# }
-
-
 variable "primary_region" {
   type        = string
   description = "Primary region for resources."
@@ -50,20 +44,19 @@ variable "common_labels" {
   }
 }
 
-variable "tfe_secrets" {
-  type = object({
-    license      = string
-    tls_cert_b64 = string
-    tls_key_b64  = string
-  })
-  description = "Secrets to be saved into Secrets Manager."
+variable "service_account_email" {
+  type        = string
+  description = "Email of service account to use for TFE."
 }
 
-
-variable "tfe_k8s_namespace" {
+variable "tfe_fqdn" {
+  description = "The FQDN for the TFE instance"
   type        = string
-  description = "Name of Kubernetes namespace for TFE (created by Helm chart). Used to configure GCP workload identity with GKE."
-  default     = "tfe"
+}
+
+variable "tfe_internal_lb_ip" {
+  description = "Internal IP address for TFE load balancer."
+  type        = string
 }
 
 # GKE Settings
@@ -132,10 +125,10 @@ variable "gcs_location" {
   description = "Location of TFE GCS bucket to create."
   default     = "US"
 
-  # validation {
-  #   condition     = contains(["US", "EU", "ASIA"], var.gcs_location)
-  #   error_message = "Supported values are 'US', 'EU', and 'ASIA'."
-  # }
+  validation {
+    condition     = contains(["US", "EU", "ASIA"], var.gcs_location)
+    error_message = "Supported values are 'US', 'EU', and 'ASIA'."
+  }
 }
 
 variable "gcs_storage_class" {

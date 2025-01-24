@@ -67,8 +67,9 @@ resource "google_container_node_pool" "control" {
 
   node_config {
     machine_type    = var.gke_node_types.control
-    service_account = google_service_account.gke.email
-    oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
+    service_account = var.service_account_email
+    # service_account = google_service_account.gke.email
+    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
 
     labels = {
       tfe_node_type = "control"
@@ -92,8 +93,9 @@ resource "google_container_node_pool" "agents" {
 
   node_config {
     machine_type    = var.gke_node_types.agent
-    service_account = google_service_account.gke.email
-    oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
+    service_account = var.service_account_email
+    # service_account = google_service_account.gke.email
+    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
 
     labels = {
       tfe_node_type = "agent"
