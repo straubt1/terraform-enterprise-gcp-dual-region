@@ -43,7 +43,9 @@ module "primary-tfe" {
   subnet_self_link = module.primary-region.subnet_self_link
 
   postgres_settings = {
-    deletion_protection = false
+    deletion_protection             = false
+    insights_query_insights_enabled = true # Help see the queries
+    point_in_time_recovery_enabled  = true
   }
   gke_settings = {
     cluster_is_private            = false
@@ -51,7 +53,7 @@ module "primary-tfe" {
   }
   tfe_secrets = {
     license      = file(var.tfe_license_file)
-    tls_cert_b64 = "aa"
-    tls_key_b64  = "aa"
+    tls_cert_b64 = filebase64("${path.cwd}/keys/tls_fullchain.pem")
+    tls_key_b64  = filebase64("${path.cwd}/keys/tls_privkey.pem")
   }
 }

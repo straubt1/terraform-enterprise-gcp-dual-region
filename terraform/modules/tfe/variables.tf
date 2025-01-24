@@ -191,6 +191,7 @@ variable "postgres_settings" {
     insights_query_string_length     = optional(number, 1024)
     insights_record_application_tags = optional(bool, false)
     insights_record_client_address   = optional(bool, false)
+    point_in_time_recovery_enabled   = optional(bool, false)
   })
   default = {} # Will fall back to each optional value's default
 }

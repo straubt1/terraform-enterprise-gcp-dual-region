@@ -73,6 +73,27 @@ resource "google_secret_manager_secret_version" "tfe_database_password" {
   secret_data = random_password.tfe_database_password.result
 }
 
+resource "google_secret_manager_secret" "tfe_redis_password" {
+  secret_id = "tfe-redis-password"
+
+  replication {
+    auto {}
+  }
+
+  annotations = {
+    description = "redis password for TFE (generate by GCP)."
+  }
+
+  labels = merge({
+    name = "tfe-redis-password"
+  }, var.common_labels)
+}
+
+resource "google_secret_manager_secret_version" "tfe_redis_password" {
+  secret      = google_secret_manager_secret.tfe_redis_password.id
+  secret_data = google_redis_instance.tfe.auth_string
+}
+
 resource "google_secret_manager_secret" "tls_cert_b64" {
   secret_id = "tls-cert-b64"
 

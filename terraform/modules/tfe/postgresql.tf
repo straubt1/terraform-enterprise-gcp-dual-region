@@ -21,8 +21,9 @@ resource "google_sql_database_instance" "tfe" {
     }
 
     backup_configuration {
-      enabled    = true
-      start_time = var.postgres_settings.backup_start_time
+      enabled                        = true
+      start_time                     = var.postgres_settings.backup_start_time
+      point_in_time_recovery_enabled = var.postgres_settings.point_in_time_recovery_enabled
     }
 
     maintenance_window {

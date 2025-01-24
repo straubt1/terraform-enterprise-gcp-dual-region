@@ -76,27 +76,27 @@ resource "google_container_node_pool" "control" {
   }
 }
 
-# resource "google_container_node_pool" "agents" {
-#   name    = "tfe-agent-pool"
-#   cluster = google_container_cluster.tfe[0].id
-#   # node_count = floor(var.gke_agent_nodes.min / var.gke_agent_nodes.zones)
-#   #Limit the node pool to a single zone to test autoscaling
-#   # node_locations = [data.google_compute_zones.up.names[0]]
-#   # restrict to up to var.gke_agent_nodes.zones number of zones
-#   node_locations = length(data.google_compute_zones.up.names) > var.gke_agent_nodes.zones ? slice(data.google_compute_zones.up.names, 0, var.gke_agent_nodes.zones) : data.google_compute_zones.up.names
+resource "google_container_node_pool" "agents" {
+  name    = "tfe-agent-pool"
+  cluster = google_container_cluster.tfe.id
+  # node_count = floor(var.gke_agent_nodes.min / var.gke_agent_nodes.zones)
+  #Limit the node pool to a single zone to test autoscaling
+  # node_locations = [data.google_compute_zones.up.names[0]]
+  # restrict to up to var.gke_agent_nodes.zones number of zones
+  node_locations = length(data.google_compute_zones.up.names) > var.gke_agent_nodes.zones ? slice(data.google_compute_zones.up.names, 0, var.gke_agent_nodes.zones) : data.google_compute_zones.up.names
 
-#   autoscaling {
-#     min_node_count = floor(var.gke_agent_nodes.min / var.gke_agent_nodes.zones)
-#     max_node_count = floor(var.gke_agent_nodes.max / var.gke_agent_nodes.zones)
-#   }
+  autoscaling {
+    min_node_count = floor(var.gke_agent_nodes.min / var.gke_agent_nodes.zones)
+    max_node_count = floor(var.gke_agent_nodes.max / var.gke_agent_nodes.zones)
+  }
 
-#   node_config {
-#     machine_type    = var.gke_node_types.agent
-#     service_account = google_service_account.gke.email
-#     oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
+  node_config {
+    machine_type    = var.gke_node_types.agent
+    service_account = google_service_account.gke.email
+    oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
 
-#     labels = {
-#       tfe_node_type = "agent"
-#     }
-#   }
-# }
+    labels = {
+      tfe_node_type = "agent"
+    }
+  }
+}
