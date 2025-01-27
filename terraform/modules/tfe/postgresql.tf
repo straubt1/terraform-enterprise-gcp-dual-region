@@ -15,7 +15,12 @@ resource "google_sql_database_instance" "tfe" {
     disk_autoresize   = var.postgres_settings.disk_autoresize
 
     ip_configuration {
-      ipv4_enabled    = false
+      ipv4_enabled = true # give it a public IP address for testing
+      authorized_networks {
+        name  = "Home"
+        value = "136.58.36.194/32"
+      }
+      # ipv4_enabled    = false
       private_network = var.vpc_self_link
       ssl_mode        = "ENCRYPTED_ONLY"
     }
