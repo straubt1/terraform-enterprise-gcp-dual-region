@@ -56,9 +56,9 @@ module "secondary-tfe" {
 
 
 
-# output "helm" {
-#   value = {
-#     primary   = module.primary-tfe.helm
-#     secondary = module.secondary-tfe.helm
-#   }
-# }
+output "helm" {
+  value = {
+    primary   = module.primary-tfe.helm
+    secondary = module.secondary-tfe.helm
+  }
+}

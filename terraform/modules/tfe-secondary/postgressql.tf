@@ -2,7 +2,7 @@ resource "random_id" "postgres_suffix" {
   byte_length = 4
 }
 
-resource "google_sql_database_instance" "read_replica" {
+resource "google_sql_database_instance" "tfe" {
   name                 = "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
   master_instance_name = var.pqsl_primary_instance_name
   region               = var.regions.secondary

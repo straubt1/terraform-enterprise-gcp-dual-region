@@ -1,0 +1,186 @@
+version: '3'
+
+vars:
+  GKE_CLUSTER_NAME: "tt-us-central1-tfe"
+  GCP_REGION: "us-central1"
+  GCP_PROJECT_ID: "hc-214541fc08ef40958e81fa9c8fa"
+  TFE_NAMESPACE: "tfe"
+  TFE_HOSTNAME: "tfe-us-central1.hc-214541fc08ef40958e81fa9c8fa.gcp.sbx.hashicorpdemo.com"
+
+dotenv: ['.env', 'secrets/.env']
+
+tasks:
+  gcp-auth:
+    desc: Login to prep for Terraform runs and kubernetes retrieval
+    cmds:
+      - gcloud auth login
+      - gcloud auth application-default login
+  gke-auth-primary:
+    desc: Get kube credentials to the primary GKE cluster
+    cmds:
+      - |
+        gcloud container clusters get-credentials $GKE_NAME_PRIMARY \
+        --region $GCP_REGION_PRIMARY --project $GCP_PROJECT_ID
+  gke-auth-secondary:
+    desc: Get kube credentials to the secondary GKE cluster
+    cmds:
+      - |
+        gcloud container clusters get-credentials $GKE_NAME_SECONDARY \
+        --region $GCP_REGION_SECONDARY --project $GCP_PROJECT_ID
+   
+  gke-pre-primary:
+    cmds:
+      - kubectl create namespace $TFE_NAMESPACE --context=$GKE_CONTEXT_PRIMARY
+  gke-pre-secondary:
+    cmds:
+      - kubectl create namespace $TFE_NAMESPACE --context=$GKE_CONTEXT_SECONDARY
+  
+  tfe-secrets-docker-primary:
+    desc: Get Docker registry credentials from Secrets Manager, then upsert them into GKE
+    cmds:
+      - |
+        TFE_LICENSE=$(gcloud secrets versions access latest --secret="tfe-license")
+        kubectl create secret docker-registry terraform-enterprise \
+          --namespace $TFE_NAMESPACE \
+          --docker-server=images.releases.hashicorp.com \
+          --docker-username=terraform \
+          --docker-password=${TFE_LICENSE} \
+          --dry-run=client -o yaml | \
+          kubectl apply --context=$GKE_CONTEXT_PRIMARY -f -
+  tfe-secrets-app-primary:
+    desc: Get secrets from Secrets Manager, then upsert them into GKE
+    cmds:
+      - |
+        TFE_LICENSE=$(gcloud secrets versions access latest --secret="tfe-license")
+        TFE_ENCRYPT_SECRET=$(gcloud secrets versions access latest --secret="tfe-encryption-password")
+        TFE_DB_SECRET=$(gcloud secrets versions access latest --secret="tfe-database-password")
+        TFE_REDIS_SECRET=$(gcloud secrets versions access latest --secret="tfe-$GCP_REGION_PRIMARY-redis-password")
+        kubectl create secret generic tfe-secrets \
+          --namespace=$TFE_NAMESPACE \
+          --from-literal=TFE_LICENSE=${TFE_LICENSE} \
+          --from-literal=TFE_ENCRYPTION_PASSWORD=${TFE_ENCRYPT_SECRET} \
+          --from-literal=TFE_DATABASE_PASSWORD=${TFE_DB_SECRET} \
+          --from-literal=TFE_REDIS_PASSWORD=${TFE_REDIS_SECRET} \
+          --dry-run=client -o yaml | \
+          kubectl apply --context=$GKE_CONTEXT_PRIMARY -f -
+  tfe-secrets-tls-primary:
+    desc: Get TLS certificates from Secrets Manager, then upsert them into GKE
+    cmds:
+      - |
+        TMP_DIR=$(mktemp -d)
+        TLS_CERT_PATH="${TMP_DIR}/tls.crt"
+        TLS_KEY_PATH="${TMP_DIR}/tls.key"
+        echo "$(gcloud secrets versions access latest --secret="tls-cert-b64")" | base64 --decode > ${TLS_CERT_PATH}
+        echo "$(gcloud secrets versions access latest --secret="tls-key-b64")" | base64 --decode > ${TLS_KEY_PATH}
+        kubectl create secret tls tfe-certs \
+          --namespace=$TFE_NAMESPACE \
+          --cert=${TLS_CERT_PATH} \
+          --key=${TLS_KEY_PATH} \
+          --dry-run=client -o yaml | \
+          kubectl apply --context=$GKE_CONTEXT_PRIMARY -f -
+        rm -rf ${TMP_DIR}
+  
+  tfe-secrets-docker-secondary:
+    desc: Get Docker registry credentials from Secrets Manager, then upsert them into GKE
+    cmds:
+      - |
+        TFE_LICENSE=$(gcloud secrets versions access latest --secret="tfe-license")
+        kubectl create secret docker-registry terraform-enterprise \
+          --namespace $TFE_NAMESPACE \
+          --docker-server=images.releases.hashicorp.com \
+          --docker-username=terraform \
+          --docker-password=${TFE_LICENSE} \
+          --dry-run=client -o yaml | \
+          kubectl apply --context=$GKE_CONTEXT_SECONDARY -f -
+  tfe-secrets-app-secondary:
+    desc: Get secrets from Secrets Manager, then upsert them into GKE
+    cmds:
+      - |
+        TFE_LICENSE=$(gcloud secrets versions access latest --secret="tfe-license")
+        TFE_ENCRYPT_SECRET=$(gcloud secrets versions access latest --secret="tfe-encryption-password")
+        TFE_DB_SECRET=$(gcloud secrets versions access latest --secret="tfe-database-password")
+        TFE_REDIS_SECRET=$(gcloud secrets versions access latest --secret="tfe-$GCP_REGION_SECONDARY-redis-password")
+        kubectl create secret generic tfe-secrets \
+          --namespace=$TFE_NAMESPACE \
+          --from-literal=TFE_LICENSE=${TFE_LICENSE} \
+          --from-literal=TFE_ENCRYPTION_PASSWORD=${TFE_ENCRYPT_SECRET} \
+          --from-literal=TFE_DATABASE_PASSWORD=${TFE_DB_SECRET} \
+          --from-literal=TFE_REDIS_PASSWORD=${TFE_REDIS_SECRET} \
+          --dry-run=client -o yaml | \
+          kubectl apply --context=$GKE_CONTEXT_SECONDARY -f -
+  tfe-secrets-tls-secondary:
+    desc: Get TLS certificates from Secrets Manager, then upsert them into GKE
+    cmds:
+      - |
+        TMP_DIR=$(mktemp -d)
+        TLS_CERT_PATH="${TMP_DIR}/tls.crt"
+        TLS_KEY_PATH="${TMP_DIR}/tls.key"
+        echo "$(gcloud secrets versions access latest --secret="tls-cert-b64")" | base64 --decode > ${TLS_CERT_PATH}
+        echo "$(gcloud secrets versions access latest --secret="tls-key-b64")" | base64 --decode > ${TLS_KEY_PATH}
+        kubectl create secret tls tfe-certs \
+          --namespace=$TFE_NAMESPACE \
+          --cert=${TLS_CERT_PATH} \
+          --key=${TLS_KEY_PATH} \
+          --dry-run=client -o yaml | \
+          kubectl apply --context=$GKE_CONTEXT_SECONDARY -f -
+        rm -rf ${TMP_DIR}
+  
+  helm-install-primary:
+    cmds:
+      - |
+        helm install terraform-enterprise hashicorp/terraform-enterprise \
+        --namespace $TFE_NAMESPACE \
+        --kube-context $GKE_CONTEXT_PRIMARY \
+        --values ./kubernetes/tfe_helm_primary.yaml
+  helm-upgrade-primary:
+    cmds:
+      - |
+        helm upgrade terraform-enterprise hashicorp/terraform-enterprise \
+        --namespace $TFE_NAMESPACE \
+        --kube-context $GKE_CONTEXT_PRIMARY \
+        --values ./kubernetes/tfe_helm_primary.yaml
+  helm-uninstall-primary:
+    cmds:
+      - |
+        helm uninstall terraform-enterprise \
+        --namespace $TFE_NAMESPACE \
+        --kube-context $GKE_CONTEXT_PRIMARY
+  
+  helm-install-secondary:
+    cmds:
+      - |
+        helm install terraform-enterprise hashicorp/terraform-enterprise \
+        --namespace $TFE_NAMESPACE \
+        --kube-context $GKE_CONTEXT_SECONDARY \
+        --values ./kubernetes/tfe_helm_secondary.yaml
+  helm-upgrade-secondary:
+    cmds:
+      - |
+        helm upgrade terraform-enterprise hashicorp/terraform-enterprise \
+        --namespace $TFE_NAMESPACE \
+        --kube-context $GKE_CONTEXT_SECONDARY \
+        --values ./kubernetes/tfe_helm_secondary.yaml
+  helm-uninstall-secondary:
+    cmds:
+      - |
+        helm uninstall terraform-enterprise \
+        --namespace $TFE_NAMESPACE \
+        --kube-context $GKE_CONTEXT_SECONDARY
+
+  tfe-initial-user:
+    cmds:
+      - |
+        IACT_TOKEN=$(kubectl exec -it --namespace=$TFE_NAMESPACE $(kubectl get pods -n $TFE_NAMESPACE --no-headers -o custom-columns=":metadata.name" | head -n 1) -- bash -c "tfectl admin token")
+        echo https://{{.TFE_HOSTNAME_PRIMARY}}/admin/account/new?token=${IACT_TOKEN}
+
+  psql-promote-replica:
+    cmds:
+      - gcloud sql instances promote-replica $PSQL_SECONDARY
+  psql-replica-status:
+    cmds:
+      - gcloud sql instances describe $PSQL_SECONDARY
+
+
+
+        # gcloud sql instances describe $PSQL_PRIMARY
+        # gcloud sql instances describe $PSQL_SECONDARY
