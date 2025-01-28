@@ -3,25 +3,34 @@ variable "project_id" {
   description = "ID of GCP project to create resources in."
 }
 
-
-variable "primary_region" {
-  type        = string
-  description = "Primary region for resources."
+variable "regions" {
+  description = "Regions to create resources in."
+  type = object({
+    primary   = string
+    secondary = string
+  })
 }
 
-variable "secondary_region" {
-  type        = string
-  description = "Secondary region for resources."
+variable "subnet_cidrs" {
+  type = object({
+    primary   = string
+    secondary = string
+  })
+  default = {
+    primary   = "10.0.1.0/24"
+    secondary = "10.0.2.0/24"
+  }
 }
 
-variable "primary_network_cidr" {
-  type        = string
-  description = "CIDR range of VPC subnetwork to create in primary region."
-}
-
-variable "secondary_network_cidr" {
-  type        = string
-  description = "CIDR range of VPC subnetwork to create in secondary region."
+variable "lb_ip_addresses" {
+  type = object({
+    primary   = string
+    secondary = string
+  })
+  default = {
+    primary   = "10.0.1.42"
+    secondary = "10.0.2.42"
+  }
 }
 
 variable "namespace" {

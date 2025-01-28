@@ -1,11 +1,11 @@
 locals {
-  name_prefix = "${var.namespace}-${var.regions.primary}"
+  name_prefix = "${var.namespace}-${var.regions.secondary}"
 }
 
 resource "google_container_cluster" "tfe" {
   name              = "${local.name_prefix}-tfe"
   project           = var.project_id
-  location          = var.regions.primary
+  location          = var.regions.secondary
   datapath_provider = var.gke_settings.datapath_provider
   release_channel {
     channel = var.gke_settings.release_channel
@@ -109,7 +109,6 @@ resource "google_container_node_pool" "agents" {
       tfe_node_type = "agent"
     }
   }
-
   lifecycle {
     ignore_changes = [
       node_config[0].resource_labels["goog-gke-node-pool-provisioning-model"]

@@ -199,3 +199,9 @@ variable "redis_settings" {
   })
   default = {}
 }
+
+
+variable "pqsl_primary_instance_name" {
+  description = "Master Postgres instance name"
+  type        = string
+}

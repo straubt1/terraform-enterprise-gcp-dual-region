@@ -13,6 +13,16 @@ variable "namespace" {
   description = "Friendly name prefix for uniquely naming resources."
 }
 
+variable "subnet_cidrs" {
+  type = object({
+    primary   = string
+    secondary = string
+  })
+  default = {
+    primary   = "10.0.1.0/24"
+    secondary = "10.0.2.0/24"
+  }
+}
 variable "subnet_cidr" {
   type        = string
   description = "CIDR range of VPC subnetwork to create."

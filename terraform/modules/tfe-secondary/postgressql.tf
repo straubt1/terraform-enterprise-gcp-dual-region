@@ -2,8 +2,11 @@ resource "random_id" "postgres_suffix" {
   byte_length = 4
 }
 
-resource "google_sql_database_instance" "tfe" {
-  name                = "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
+resource "google_sql_database_instance" "read_replica" {
+  name                 = "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
+  master_instance_name = var.pqsl_primary_instance_name
+  region               = var.regions.secondary
+
   database_version    = var.postgres_settings.version
   deletion_protection = var.postgres_settings.deletion_protection
 
@@ -21,21 +24,17 @@ resource "google_sql_database_instance" "tfe" {
         value = "136.58.36.194/32"
       }
       # ipv4_enabled    = false
+      # hard coded to the primar region VPC
+      # private_network = "https://www.googleapis.com/compute/v1/projects/hc-214541fc08ef40958e81fa9c8fa/global/networks/tt-us-central1-vpc"
       private_network = var.vpc_self_link
       ssl_mode        = "ENCRYPTED_ONLY"
     }
 
-    backup_configuration {
-      enabled                        = true
-      start_time                     = var.postgres_settings.backup_start_time
-      point_in_time_recovery_enabled = var.postgres_settings.point_in_time_recovery_enabled
-    }
-
-    maintenance_window {
-      day          = var.postgres_settings.maintenance_window_day
-      hour         = var.postgres_settings.maintenance_window_hour
-      update_track = var.postgres_settings.maintenance_window_update_track
-    }
+    # maintenance_window {
+    #   day          = var.postgres_settings.maintenance_window_day
+    #   hour         = var.postgres_settings.maintenance_window_hour
+    #   update_track = var.postgres_settings.maintenance_window_update_track
+    # }
 
     insights_config {
       query_insights_enabled  = var.postgres_settings.insights_query_insights_enabled
@@ -48,20 +47,9 @@ resource "google_sql_database_instance" "tfe" {
     user_labels = merge({
       name = "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
     }, var.common_labels)
+
+    # replica_configuration {
+    #   failover_target = false #not support for Postgres
+    # }
   }
-}
-
-resource "google_sql_database" "tfe" {
-  name     = var.tfe_database.name
-  instance = google_sql_database_instance.tfe.name
-}
-
-data "google_secret_manager_secret_version" "tfe_database_password" {
-  secret = "tfe-database-password"
-}
-
-resource "google_sql_user" "tfe" {
-  name     = var.tfe_database.user
-  instance = google_sql_database_instance.tfe.name
-  password = data.google_secret_manager_secret_version.tfe_database_password.secret_data
 }

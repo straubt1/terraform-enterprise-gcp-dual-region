@@ -1,5 +1,7 @@
 locals {
-  name_prefix = "${var.namespace}-${var.region}"
+  name_prefix           = var.namespace                               # Resources that are not specific to a region
+  name_prefix_primary   = "${var.namespace}-${var.regions.primary}"   # Resources in primary region
+  name_prefix_secondary = "${var.namespace}-${var.regions.secondary}" # Resources in secondary region
 }
 
 resource "google_compute_network" "vpc" {
@@ -9,13 +11,24 @@ resource "google_compute_network" "vpc" {
   delete_default_routes_on_create = false
 }
 
-resource "google_compute_subnetwork" "subnet" {
-  name                     = "${local.name_prefix}-subnet"
+resource "google_compute_subnetwork" "primary" {
+  name                     = "${local.name_prefix_primary}-subnet"
   network                  = google_compute_network.vpc.self_link
+  region                   = var.regions.primary
+  ip_cidr_range            = var.subnet_cidrs.primary
   purpose                  = "PRIVATE"
-  ip_cidr_range            = var.subnet_cidr
-  private_ip_google_access = true
   stack_type               = "IPV4_ONLY"
+  private_ip_google_access = true
+}
+
+resource "google_compute_subnetwork" "secondary" {
+  name                     = "${local.name_prefix_secondary}-subnet"
+  network                  = google_compute_network.vpc.self_link
+  region                   = var.regions.secondary
+  ip_cidr_range            = var.subnet_cidrs.secondary
+  purpose                  = "PRIVATE"
+  stack_type               = "IPV4_ONLY"
+  private_ip_google_access = true
 }
 
 resource "google_compute_router" "router" {
@@ -36,8 +49,8 @@ resource "google_compute_router_nat" "nat" {
 }
 
 resource "google_compute_global_address" "private_data" {
-  project       = var.project_id
-  name          = "${local.name_prefix}-tfe-private-data-access"
+  name = "${local.name_prefix}-tfe-private-data-access"
+  # project       = var.project_id
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
@@ -48,6 +61,7 @@ resource "google_service_networking_connection" "private_data" {
   network                 = google_compute_network.vpc.self_link
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.private_data.name]
+  deletion_policy         = "ABANDON"
 }
 
 resource "google_compute_firewall" "https" {
@@ -67,7 +81,6 @@ resource "google_compute_firewall" "lb_health_checks" {
   network       = google_compute_network.vpc.self_link
   direction     = "INGRESS"
   source_ranges = var.cidr_allow_ingress_lb_health_probes
-  # added 0.0.0.0/0 to allow for testing in the GCP console
 
   allow {
     protocol = "tcp"

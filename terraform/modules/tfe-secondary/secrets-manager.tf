@@ -1,5 +1,5 @@
 resource "google_secret_manager_secret" "tfe_redis_password" {
-  secret_id = "tfe-${var.regions.primary}-redis-password"
+  secret_id = "tfe-${var.regions.secondary}-redis-password"
 
   replication {
     auto {}
@@ -10,7 +10,7 @@ resource "google_secret_manager_secret" "tfe_redis_password" {
   }
 
   labels = merge({
-    name = "tfe-${var.regions.primary}-redis-password"
+    name = "tfe-${var.regions.secondary}-redis-password"
   }, var.common_labels)
 }
 
