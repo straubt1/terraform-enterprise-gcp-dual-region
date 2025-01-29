@@ -40,3 +40,4 @@ hashicorp*.md
 keys/
 secrets/
 data-work/
+.env

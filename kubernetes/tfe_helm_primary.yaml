@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 3
 tls:
   certificateSecret: tfe-certs
 
@@ -43,14 +43,14 @@ env:
     TFE_HOSTNAME: tfe-us-central1.hc-214541fc08ef40958e81fa9c8fa.gcp.sbx.hashicorpdemo.com
 
     # Database settings
-    TFE_DATABASE_HOST: 10.173.1.8:5432
+    TFE_DATABASE_HOST: 10.173.1.17:5432
     TFE_DATABASE_NAME: tfe
     TFE_DATABASE_USER: tfe
     TFE_DATABASE_PARAMETERS: sslmode=require
 
     # Object storage settings
     TFE_OBJECT_STORAGE_TYPE: google
-    TFE_OBJECT_STORAGE_GOOGLE_BUCKET: tt-49f398d6-tfe-gcs
+    TFE_OBJECT_STORAGE_GOOGLE_BUCKET: tt-7577a0bb-tfe-gcs
     TFE_OBJECT_STORAGE_GOOGLE_PROJECT: hc-214541fc08ef40958e81fa9c8fa
 
     # Redis settings
@@ -58,7 +58,7 @@ env:
     TFE_REDIS_USE_AUTH: true
     TFE_REDIS_USE_TLS: false
 
-    TFE_CAPACITY_CONCURRENCY: 4
+    TFE_CAPACITY_CONCURRENCY: 10
     # TFE_CAPACITY_CPU: 0
     TFE_CAPACITY_MEMORY: 2048
     TFE_RUN_PIPELINE_KUBERNETES_WORKER_TIMEOUT: 300

@@ -50,7 +50,7 @@ env:
 
     # Object storage settings
     TFE_OBJECT_STORAGE_TYPE: google
-    TFE_OBJECT_STORAGE_GOOGLE_BUCKET: tt-49f398d6-tfe-gcs
+    TFE_OBJECT_STORAGE_GOOGLE_BUCKET: tt-7577a0bb-tfe-gcs
     TFE_OBJECT_STORAGE_GOOGLE_PROJECT: hc-214541fc08ef40958e81fa9c8fa
 
     # Redis settings
