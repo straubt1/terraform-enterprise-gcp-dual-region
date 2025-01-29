@@ -1,6 +1,6 @@
 resource "google_redis_instance" "tfe" {
-  name                    = "${var.namespace}-tfe-redis"
-  display_name            = "${var.namespace}-tfe-redis"
+  name                    = "${local.name_prefix}-tfe-redis"
+  display_name            = "${local.name_prefix}-tfe-redis"
   tier                    = var.redis_settings.tier
   redis_version           = var.redis_settings.version
   memory_size_gb          = var.redis_settings.memory_size_gb
@@ -9,7 +9,7 @@ resource "google_redis_instance" "tfe" {
   authorized_network      = var.vpc_self_link
   auth_enabled            = true
   labels = merge({
-    name = "${var.namespace}-tfe-redis"
+    name = "${local.name_prefix}-tfe-redis"
   }, var.common_labels)
 }
 

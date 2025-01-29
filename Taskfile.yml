@@ -170,17 +170,10 @@ tasks:
   tfe-initial-user:
     cmds:
       - |
-        IACT_TOKEN=$(kubectl exec -it --namespace=$TFE_NAMESPACE $(kubectl get pods -n $TFE_NAMESPACE --no-headers -o custom-columns=":metadata.name" | head -n 1) -- bash -c "tfectl admin token")
-        echo https://{{.TFE_HOSTNAME_PRIMARY}}/admin/account/new?token=${IACT_TOKEN}
+        POD=$(kubectl get pods -n $TFE_NAMESPACE --context=$GKE_CONTEXT_PRIMARY --no-headers -o custom-columns=":metadata.name" | head -n 1)
+        IACT_TOKEN=$(kubectl exec -it --namespace=$TFE_NAMESPACE --context=$GKE_CONTEXT_PRIMARY $POD -- bash -c "tfectl admin token")
+        echo https://$TFE_HOSTNAME_PRIMARY/admin/account/new?token=$IACT_TOKEN
 
   psql-promote-replica:
     cmds:
-      - gcloud sql instances promote-replica $PSQL_SECONDARY
-  psql-replica-status:
-    cmds:
-      - gcloud sql instances describe $PSQL_SECONDARY
-
-
-
-        # gcloud sql instances describe $PSQL_PRIMARY
-        # gcloud sql instances describe $PSQL_SECONDARY
+      - time gcloud sql instances promote-replica $PSQL_SECONDARY
