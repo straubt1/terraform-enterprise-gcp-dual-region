@@ -4,6 +4,7 @@ resource "random_id" "postgres_suffix" {
 
 resource "google_sql_database_instance" "tfe" {
   name                = "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
+  region              = var.regions.primary
   database_version    = var.postgres_settings.version
   deletion_protection = var.postgres_settings.deletion_protection
 

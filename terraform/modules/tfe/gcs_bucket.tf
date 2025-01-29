@@ -13,6 +13,7 @@ resource "google_storage_bucket" "tfe" {
   }, var.common_labels)
 
   rpo = "ASYNC_TURBO"
+  # public_access_prevention = "enforced"
 
   custom_placement_config {
     data_locations = [upper(var.regions.primary), upper(var.regions.secondary)]

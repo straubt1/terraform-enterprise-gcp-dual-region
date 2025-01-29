@@ -24,12 +24,15 @@ resource "google_sql_database_instance" "tfe" {
         value = "136.58.36.194/32"
       }
       # ipv4_enabled    = false
-      # hard coded to the primar region VPC
-      # private_network = "https://www.googleapis.com/compute/v1/projects/hc-214541fc08ef40958e81fa9c8fa/global/networks/tt-us-central1-vpc"
       private_network = var.vpc_self_link
       ssl_mode        = "ENCRYPTED_ONLY"
     }
 
+    backup_configuration {
+      enabled                        = true
+      start_time                     = var.postgres_settings.backup_start_time
+      point_in_time_recovery_enabled = var.postgres_settings.point_in_time_recovery_enabled
+    }
     # maintenance_window {
     #   day          = var.postgres_settings.maintenance_window_day
     #   hour         = var.postgres_settings.maintenance_window_hour
@@ -48,8 +51,5 @@ resource "google_sql_database_instance" "tfe" {
       name = "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
     }, var.common_labels)
 
-    # replica_configuration {
-    #   failover_target = false #not support for Postgres
-    # }
   }
 }
