@@ -6,30 +6,30 @@ variable "project_id" {
 variable "regions" {
   description = "Regions to create resources in."
   type = object({
-    primary   = string
-    secondary = string
+    blue  = string
+    green = string
   })
 }
 
 variable "subnet_cidrs" {
   type = object({
-    primary   = string
-    secondary = string
+    blue  = string
+    green = string
   })
   default = {
-    primary   = "10.0.1.0/24"
-    secondary = "10.0.2.0/24"
+    blue  = "10.0.1.0/24"
+    green = "10.0.2.0/24"
   }
 }
 
 variable "lb_ip_addresses" {
   type = object({
-    primary   = string
-    secondary = string
+    blue  = string
+    green = string
   })
   default = {
-    primary   = "10.0.1.42"
-    secondary = "10.0.2.42"
+    blue  = "10.0.1.42"
+    green = "10.0.2.42"
   }
 }
 
@@ -62,8 +62,8 @@ variable "cert_email" {
   description = "The email to use when generating TLS certs"
 }
 
-variable "dns_zone_name" {
-  description = "GCP DNS Zone Name (example: doormat-accountid)"
+variable "managed_zone_name" {
+  description = "GCP DNS Zone Name."
 }
 
 variable "common_labels" {
@@ -76,90 +76,3 @@ variable "common_labels" {
     error_message = "All keys and values must start with a lowercase letter and only contain lowercase letters, digits, underscores, or hyphens, and be no longer than 63 characters."
   }
 }
-
-# variable "vpc_name" {
-#   type        = string
-#   description = "Name of VPC network to create."
-#   default     = "tfe-vpc"
-# }
-
-# variable "subnet_name" {
-#   type        = string
-#   description = "Name of VPC subnetwork to create."
-#   default     = "tfe-subnet"
-# }
-
-# variable "subnet_cidr" {
-#   type        = string
-#   description = "CIDR range of VPC subnetwork to create."
-#   default     = "10.0.0.0/24"
-# }
-
-# variable "tfe_internal_lb_ip" {
-#   type        = string
-#   description = "IP address to assign to internal TFE load balancer."
-#   default     = "10.0.0.42"
-# }
-
-# variable "cidr_allow_ingress_bastion" {
-#   type        = list(string)
-#   description = "List of source CIDR ranges to allow inbound to VPC on port 22 (SSH) to access the bastion host."
-#   default     = []
-# }
-
-# variable "cidr_allow_ingress_https" {
-#   type        = list(string)
-#   description = "List of source CIDR ranges of users/clients/VCS to allow inbound to VPC on port 443 (HTTPS) for TFE application traffic."
-#   default     = []
-# }
-
-# variable "cidr_allow_ingress_lb_health_probes" {
-#   type        = list(string)
-#   description = "List of GCP source CIDR ranges to allow inbound to VPC on port 443 (HTTPS) for load balancer health probe traffic."
-#   # https://cloud.google.com/load-balancing/docs/health-check-concepts#ip-ranges
-#   default = ["35.191.0.0/16", "130.211.0.0/22"]
-# }
-
-# variable "bastion_name" {
-#   type        = string
-#   description = "Name of bastion VM. Only valid when `create_bastion` is `true`."
-#   default     = "tfe-bastion"
-# }
-
-# #------------------------------------------------------------------------------
-# # Secret Manager
-# #------------------------------------------------------------------------------
-# variable "tfe_secrets" {
-
-#   type = object({
-#     tfe_license_file          = string
-#     database_secret           = string
-#     encryption_secret         = string
-#     tls_cert_secret_file      = string
-#     tls_privkey_secret_file   = string
-#     tls_ca_bundle_secret_file = string
-#   })
-# }
-
-
-
-# # #------------------------------------------------------------------------------
-# # # Cloud DNS
-# # #------------------------------------------------------------------------------
-# # variable "create_cloud_dns_zone" {
-# #   type        = bool
-# #   description = "Boolean to create Cloud DNS Zone."
-# #   default     = false
-# # }
-
-# # variable "cloud_dns_zone_name" {
-# #   type        = string
-# #   description = "Name to the Cloud DNS zone. Required when `create_cloud_dns_zone` is `true`."
-# #   default     = null
-# # }
-
-# # variable "cloud_dns_zone_domain" {
-# #   type        = string
-# #   description = "DNS name suffix of the Cloud DNS zone. Required when `create_cloud_dns_zone` is `true`."
-# #   default     = null
-# # }

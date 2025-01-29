@@ -1,11 +1,12 @@
 locals {
-  name_prefix = "${var.namespace}-${var.regions.primary}"
+  # name_prefix = "${var.namespace}-${var.regions.primary}"
+  gke_name = "${var.namespace}-gke"
 }
 
 resource "google_container_cluster" "tfe" {
-  name              = "${local.name_prefix}-tfe"
+  name              = local.gke_name
   project           = var.project_id
-  location          = var.regions.primary
+  location          = var.main_region
   datapath_provider = var.gke_settings.datapath_provider
   release_channel {
     channel = var.gke_settings.release_channel
@@ -70,8 +71,7 @@ resource "google_container_node_pool" "control" {
   node_config {
     machine_type    = var.gke_node_types.control
     service_account = var.service_account_email
-    # service_account = google_service_account.gke.email
-    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
 
     labels = {
       tfe_node_type = "control"
@@ -102,8 +102,7 @@ resource "google_container_node_pool" "agents" {
   node_config {
     machine_type    = var.gke_node_types.agent
     service_account = var.service_account_email
-    # service_account = google_service_account.gke.email
-    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
 
     labels = {
       tfe_node_type = "agent"

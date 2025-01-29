@@ -1,8 +1,8 @@
 locals {
   fqdn = {
-    tfe           = "tfe.${var.domain}"
-    tfe-primary   = "tfe-${var.regions.primary}.${var.domain}"
-    tfe-secondary = "tfe-${var.regions.secondary}.${var.domain}"
+    tfe       = "tfe.${var.domain}"
+    tfe-blue  = "tfe-blue.${var.domain}"
+    tfe-green = "tfe-green.${var.domain}"
   }
 }
 
@@ -14,13 +14,13 @@ module "bootstrap_project" {
   subnet_cidrs             = var.subnet_cidrs
   cidr_allow_ingress_https = var.cidr_allow_ingress
 
-  managed_zone_name = var.dns_zone_name
+  managed_zone_name = var.managed_zone_name
   tls_certificate = {
     email_address = var.cert_email
     common_name   = local.fqdn.tfe
     subject_alternative_names = [
-      local.fqdn.tfe-primary,
-      local.fqdn.tfe-secondary
+      local.fqdn.tfe-blue,
+      local.fqdn.tfe-green
     ]
   }
   create_cert_files = true

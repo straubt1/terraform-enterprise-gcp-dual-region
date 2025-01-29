@@ -1,6 +1,6 @@
 resource "google_service_account" "gke" {
-  account_id   = "${local.name_prefix}-gke-cluster-sa"
-  display_name = "${local.name_prefix}-gke-cluster-sa"
+  account_id   = "${var.namespace}-gke-cluster-sa"
+  display_name = "${var.namespace}-gke-cluster-sa"
   description  = "Custom service account for TFE/GKE clusters."
 }
 
@@ -44,8 +44,8 @@ resource "google_project_iam_member" "gke_artifact_reader" {
 # TFE service account
 #------------------------------------------------------------------------------
 resource "google_service_account" "tfe" {
-  account_id   = "${local.name_prefix}-tfe-sa"
-  display_name = "${local.name_prefix}-tfe-sa"
+  account_id   = "${var.namespace}-sa"
+  display_name = "${var.namespace}-sa"
   description  = "Custom service account for TFE for GCP GKE workload identity."
 }
 

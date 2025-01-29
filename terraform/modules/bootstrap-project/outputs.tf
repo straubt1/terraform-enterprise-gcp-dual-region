@@ -10,8 +10,8 @@ output "service_account_email" {
 
 output "networking" {
   value = {
-    vpc_self_link              = google_compute_network.vpc.self_link
-    subnet_self_link_primary   = google_compute_subnetwork.primary.self_link
-    subnet_self_link_secondary = google_compute_subnetwork.secondary.self_link
+    vpc_self_link          = google_compute_network.vpc.self_link
+    subnet_self_link_blue  = google_compute_subnetwork.blue.self_link
+    subnet_self_link_green = google_compute_subnetwork.green.self_link
   }
 }

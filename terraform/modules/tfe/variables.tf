@@ -4,36 +4,45 @@ variable "project_id" {
 }
 
 variable "regions" {
-  description = "Regions to create resources in."
+  description = "Dual Regions for multi-region resources."
   type = object({
-    primary   = string
-    secondary = string
+    blue  = string
+    green = string
   })
 }
 
-variable "namespace" {
+variable "main_region" {
+  description = "Main region for resources, this is where most resources will be deploye to."
   type        = string
+  validation {
+    condition     = var.main_region == var.regions.blue || var.main_region == var.regions.green
+    error_message = "main_region must match either regions.blue or regions.green."
+  }
+}
+
+variable "namespace" {
   description = "Friendly name prefix for uniquely naming resources."
+  type        = string
 }
 
 variable "vpc_self_link" {
-  type        = string
   description = "Self link of VPC to create resources in."
+  type        = string
 }
 
 variable "subnet_self_link" {
-  type        = string
   description = "Self link of subnet to create resources in."
+  type        = string
 }
 
 variable "ssh_public_key" {
-  type        = string
   description = "SSH public key to add to bastion VM."
+  type        = string
 }
 
 variable "common_labels" {
-  type        = map(string)
   description = "Common labels to apply to GCP resources."
+  type        = map(string)
   default     = {}
 
   validation {
@@ -43,10 +52,14 @@ variable "common_labels" {
 }
 
 variable "service_account_email" {
-  type        = string
   description = "Email of service account to use for TFE."
+  type        = string
 }
 
+variable "managed_zone_name" {
+  description = "Name of managed DNS zone to create records in."
+  type        = string
+}
 variable "tfe_fqdn" {
   description = "The FQDN for the TFE instance"
   type        = string
@@ -161,6 +174,16 @@ variable "tfe_database" {
     user = optional(string, "tfe")
   })
   default = {}
+}
+
+variable "postgres_active_instance_name" {
+  description = <<-EOT
+    Currently active Postgres instance name. 
+    If null, the active instance will be created. 
+    Else a read replica will be created.
+  EOT
+  type        = string
+  default     = null
 }
 
 variable "postgres_settings" {

@@ -11,15 +11,15 @@ variable "namespace" {
 variable "regions" {
   description = "Regions to create resources in."
   type = object({
-    primary   = string
-    secondary = string
+    blue  = string
+    green = string
   })
 }
 
 variable "subnet_cidrs" {
   type = object({
-    primary   = string
-    secondary = string
+    blue  = string
+    green = string
   })
 }
 

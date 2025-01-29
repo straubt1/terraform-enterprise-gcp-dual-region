@@ -26,7 +26,7 @@ terraform {
 
 provider "google" {
   project = var.project_id
-  region  = var.regions.primary
+  region  = var.regions.blue
 }
 
 provider "acme" {
