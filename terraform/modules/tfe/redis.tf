@@ -5,6 +5,9 @@ locals {
 resource "google_redis_instance" "tfe" {
   name                    = local.redis_name
   display_name            = local.redis_name
+  location_id             = data.google_compute_zones.up.names[0]
+  alternative_location_id = data.google_compute_zones.up.names[1]
+
   tier                    = var.redis_settings.tier
   redis_version           = var.redis_settings.version
   memory_size_gb          = var.redis_settings.memory_size_gb

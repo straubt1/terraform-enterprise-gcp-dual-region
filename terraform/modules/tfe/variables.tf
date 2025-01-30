@@ -176,6 +176,14 @@ variable "tfe_database" {
   default = {}
 }
 
+variable "gcs_active_instance_name" {
+  description = <<-EOT
+    Currently active GCS instance name.
+    Used only to generate a helm overrides file in the secondary region
+  EOT
+  type        = string
+  default     = null
+}
 variable "postgres_active_instance_name" {
   description = <<-EOT
     Currently active Postgres instance name. 
@@ -221,4 +229,10 @@ variable "redis_settings" {
     connect_mode            = optional(string, "PRIVATE_SERVICE_ACCESS")
   })
   default = {}
+}
+
+variable "helm_overrides_directory" {
+  description = "Directory containing Helm overrides."
+  type        = string
+  default     = "../kubernetes"
 }

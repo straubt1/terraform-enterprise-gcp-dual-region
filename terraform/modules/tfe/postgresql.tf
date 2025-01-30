@@ -2,12 +2,12 @@
 #   byte_length = 4
 # }
 locals {
-  gsql_database_name = "${var.namespace}-psql"
+  gsql_database_instance_name = "${var.namespace}-psql"
   # "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
 }
 
 resource "google_sql_database_instance" "tfe" {
-  name                = local.gsql_database_name
+  name                = local.gsql_database_instance_name
   region              = var.main_region
   database_version    = var.postgres_settings.version
   deletion_protection = var.postgres_settings.deletion_protection
@@ -60,7 +60,7 @@ resource "google_sql_database_instance" "tfe" {
     }
 
     user_labels = merge({
-      name = local.gsql_database_name
+      name = local.gsql_database_instance_name
     }, var.common_labels)
   }
 }

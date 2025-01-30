@@ -131,14 +131,15 @@ tasks:
         helm install terraform-enterprise hashicorp/terraform-enterprise \
         --namespace $TFE_NAMESPACE \
         --kube-context $GKE_CONTEXT_PRIMARY \
-        --values ./kubernetes/tfe_helm_primary.yaml
+        --values ./kubernetes/${GKE_NAME_PRIMARY}_overrides.yaml
+        # --values ./kubernetes/tfe_helm_primary.yaml
   helm-upgrade-primary:
     cmds:
       - |
         helm upgrade terraform-enterprise hashicorp/terraform-enterprise \
         --namespace $TFE_NAMESPACE \
         --kube-context $GKE_CONTEXT_PRIMARY \
-        --values ./kubernetes/tfe_helm_primary.yaml
+        --values ./kubernetes/${GKE_NAME_PRIMARY}_overrides.yaml
   helm-uninstall-primary:
     cmds:
       - |
@@ -152,14 +153,14 @@ tasks:
         helm install terraform-enterprise hashicorp/terraform-enterprise \
         --namespace $TFE_NAMESPACE \
         --kube-context $GKE_CONTEXT_SECONDARY \
-        --values ./kubernetes/tfe_helm_secondary.yaml
+        --values ./kubernetes/${GKE_NAME_SECONDARY}_overrides.yaml
   helm-upgrade-secondary:
     cmds:
       - |
         helm upgrade terraform-enterprise hashicorp/terraform-enterprise \
         --namespace $TFE_NAMESPACE \
         --kube-context $GKE_CONTEXT_SECONDARY \
-        --values ./kubernetes/tfe_helm_secondary.yaml
+        --values ./kubernetes/${GKE_NAME_SECONDARY}_overrides.yaml
   helm-uninstall-secondary:
     cmds:
       - |
@@ -177,3 +178,19 @@ tasks:
   psql-promote-replica:
     cmds:
       - time gcloud sql instances promote-replica $PSQL_SECONDARY
+  tfe-create-backup:
+    cmds: 
+      - |
+        curl \
+          --header "Authorization: Bearer $BACKUP_TOKEN" \
+          --request POST \
+          --data "{\"password\":\"$BACKUP_PASSWORD\"}" \
+          --output backup.blob \
+          https://$TFE_HOSTNAME_PRIMARY/_backup/api/v1/backup
+  tf-update-helm:
+    dir: ./terraform
+    cmds: 
+      - |
+        terraform apply \
+        -replace module.tfe-blue.local_file.helm \
+        -replace module.tfe-green.local_file.helm \

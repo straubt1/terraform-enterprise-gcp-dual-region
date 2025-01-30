@@ -1,0 +1,65 @@
+replicaCount: 1
+
+image:
+  repository: images.releases.hashicorp.com
+  name: hashicorp/terraform-enterprise
+  tag: v202409-3
+
+serviceAccount:
+  annotations:
+    iam.gke.io/gcp-service-account: ${gcp-service-account}
+
+nodeSelector:
+  cloud.google.com/gke-nodepool: ${gke-control-pool}
+
+agentWorkerPodTemplate:
+  spec:
+    nodeSelector:
+      cloud.google.com/gke-nodepool: ${gke-agent-pool}
+
+service:
+  annotations:
+    cloud.google.com/l4-rbs: enabled
+    networking.gke.io/load-balancer-ip-addresses: ${tfe_lb_ip_name}
+  type: LoadBalancer
+  port: 443
+
+tfe:
+  metrics:
+    enable: true
+    httpPort: 9090
+    httpsPort: 9091
+  privateHttpPort: 8080
+  privateHttpsPort: 8443
+
+tls:
+  certificateSecret: tfe-certs
+
+env:
+  secretRefs:
+    - name: tfe-secrets
+
+  variables:
+    # TFE config settings
+    TFE_HOSTNAME: ${tfe_hostname}
+
+    # Database settings
+    TFE_DATABASE_HOST: ${database_host}
+    TFE_DATABASE_NAME: ${database_name}
+    TFE_DATABASE_USER: ${database_user}
+    TFE_DATABASE_PARAMETERS: sslmode=require
+
+    # Object storage settings
+    TFE_OBJECT_STORAGE_TYPE: google
+    TFE_OBJECT_STORAGE_GOOGLE_BUCKET: ${gcs_bucket_name}
+    TFE_OBJECT_STORAGE_GOOGLE_PROJECT: ${project_id}
+
+    # Redis settings
+    TFE_REDIS_HOST: ${redis_host}
+    TFE_REDIS_USE_AUTH: true
+    TFE_REDIS_USE_TLS: false
+
+    TFE_CAPACITY_CONCURRENCY: 10
+    # TFE_CAPACITY_CPU: 0
+    TFE_CAPACITY_MEMORY: 2048
+    TFE_RUN_PIPELINE_KUBERNETES_WORKER_TIMEOUT: 300

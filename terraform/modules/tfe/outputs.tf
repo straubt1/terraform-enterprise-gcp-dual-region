@@ -6,6 +6,7 @@ output "helm" {
     psql_ip_private    = google_sql_database_instance.tfe.private_ip_address
     bucket             = try(google_storage_bucket.tfe["tfe"].id, "")
     redis              = google_redis_instance.tfe.host
+    fqdn               = "https://${var.tfe_fqdn}"
   }
 }
 
