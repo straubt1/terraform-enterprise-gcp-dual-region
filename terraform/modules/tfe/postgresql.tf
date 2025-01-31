@@ -4,6 +4,15 @@
 locals {
   gsql_database_instance_name = "${var.namespace}-psql"
   # "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
+
+  # Command to create new database and user, only on FIRST create
+  db_exec_command = <<-EOT
+    gcloud sql databases create ${var.tfe_database.name} \
+    --instance=${google_sql_database_instance.tfe.name} && \
+    gcloud sql users create {username} \
+    --instance=${google_sql_database_instance.tfe.name} \
+    --password=${data.google_secret_manager_secret_version.tfe_database_password.secret_data}
+  EOT
 }
 
 resource "google_sql_database_instance" "tfe" {
@@ -63,22 +72,33 @@ resource "google_sql_database_instance" "tfe" {
       name = local.gsql_database_instance_name
     }, var.common_labels)
   }
+
+  provisioner "local-exec" {
+    when    = create
+    command = var.postgres_active_instance_name == null ? "gcloud sql databases create ${var.tfe_database.name} --instance=${google_sql_database_instance.tfe.name}" : "echo 'Instance already exists, skipping database creation'"
+  }
 }
 
-resource "google_sql_database" "tfe" {
-  for_each = toset(var.postgres_active_instance_name == null ? ["tfe"] : [])
-  name     = var.tfe_database.name
-  instance = google_sql_database_instance.tfe.name
+locals {
+
 }
+
+# gcloud sql databases create {database_name} --instance={instance_name}
+
+# resource "google_sql_database" "tfe" {
+#   for_each = toset(var.postgres_active_instance_name == null ? ["tfe"] : [])
+#   name     = var.tfe_database.name
+#   instance = google_sql_database_instance.tfe.name
+# }
 
 data "google_secret_manager_secret_version" "tfe_database_password" {
   secret     = "tfe-database-password"
   depends_on = [google_sql_database_instance.tfe] # Created by the bootstrapping module, may not exist on net new
 }
 
-resource "google_sql_user" "tfe" {
-  for_each = toset(var.postgres_active_instance_name == null ? ["tfe"] : [])
-  name     = var.tfe_database.user
-  instance = google_sql_database_instance.tfe.name
-  password = data.google_secret_manager_secret_version.tfe_database_password.secret_data
-}
+# resource "google_sql_user" "tfe" {
+#   for_each = toset(var.postgres_active_instance_name == null ? ["tfe"] : [])
+#   name     = var.tfe_database.user
+#   instance = google_sql_database_instance.tfe.name
+#   password = data.google_secret_manager_secret_version.tfe_database_password.secret_data
+# }

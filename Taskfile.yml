@@ -35,6 +35,11 @@ tasks:
     cmds:
       - kubectl create namespace $TFE_NAMESPACE --context=$GKE_CONTEXT_SECONDARY
   
+  tfe-secrets-primary:
+    cmds:
+      - task: tfe-secrets-docker-primary
+      - task: tfe-secrets-app-primary
+      - task: tfe-secrets-tls-primary
   tfe-secrets-docker-primary:
     desc: Get Docker registry credentials from Secrets Manager, then upsert them into GKE
     cmds:
@@ -80,6 +85,11 @@ tasks:
           kubectl apply --context=$GKE_CONTEXT_PRIMARY -f -
         rm -rf ${TMP_DIR}
   
+  tfe-secrets-secondary:
+    cmds:
+      - task: tfe-secrets-docker-secondary
+      - task: tfe-secrets-app-secondary
+      - task: tfe-secrets-tls-secondary
   tfe-secrets-docker-secondary:
     desc: Get Docker registry credentials from Secrets Manager, then upsert them into GKE
     cmds:
@@ -146,7 +156,7 @@ tasks:
         helm uninstall terraform-enterprise \
         --namespace $TFE_NAMESPACE \
         --kube-context $GKE_CONTEXT_PRIMARY
-  
+
   helm-install-secondary:
     cmds:
       - |
@@ -175,9 +185,12 @@ tasks:
         IACT_TOKEN=$(kubectl exec -it --namespace=$TFE_NAMESPACE --context=$GKE_CONTEXT_PRIMARY $POD -- bash -c "tfectl admin token")
         echo https://$TFE_HOSTNAME_PRIMARY/admin/account/new?token=$IACT_TOKEN
 
-  psql-promote-replica:
+  psql-promote-replica-from-primary:
     cmds:
       - time gcloud sql instances promote-replica $PSQL_SECONDARY
+  psql-promote-replica-from-secondary:
+    cmds:
+      - time gcloud sql instances promote-replica $PSQL_PRIMARY
   tfe-create-backup:
     cmds: 
       - |

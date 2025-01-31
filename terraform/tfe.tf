@@ -20,8 +20,6 @@ locals {
   }
 }
 
-
-
 module "tfe-blue" {
   source = "./modules/tfe"
 
@@ -39,6 +37,7 @@ module "tfe-blue" {
   service_account_email = module.bootstrap_project.service_account_email
   gcs_force_destroy     = true
 
+  # postgres_active_instance_name = "tt-tfe-green-psql"
   postgres_active_instance_name = null
 
   postgres_settings = local.postgres_settings
@@ -64,6 +63,7 @@ module "tfe-green" {
   service_account_email = module.bootstrap_project.service_account_email
   gcs_force_destroy     = true
 
+  # postgres_active_instance_name = null
   postgres_active_instance_name = module.tfe-blue.postgres_instance_name
   gcs_active_instance_name      = module.tfe-blue.helm.bucket
 
