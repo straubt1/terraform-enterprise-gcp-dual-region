@@ -13,3 +13,10 @@ output "helm" {
 output "postgres_instance_name" {
   value = google_sql_database_instance.tfe.name
 }
+
+output "tfe_lb_ips" {
+  value = {
+    external = google_compute_address.tfe_external_lb.address
+    internal = google_compute_address.tfe_internal_lb.address
+  }
+}

@@ -41,3 +41,4 @@ keys/
 secrets/
 data-work/
 .env
+!examples/*

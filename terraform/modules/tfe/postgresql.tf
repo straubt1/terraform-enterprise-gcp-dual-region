@@ -1,8 +1,10 @@
-# resource "random_id" "postgres_suffix" {
-#   byte_length = 4
-# }
+data "google_secret_manager_secret_version" "tfe_database_password" {
+  secret = "tfe-database-password"
+  # depends_on = [google_sql_database_instance.tfe] # Created by the bootstrapping module, may not exist on net new
+}
+
 locals {
-  gsql_database_instance_name = "${var.namespace}-psql"
+  # gsql_database_instance_name = "${var.namespace}-psql"
   # "${var.namespace}-${random_id.postgres_suffix.hex}-tfe-psql"
 
   # Command to create new database and user, only on FIRST create
@@ -16,12 +18,13 @@ locals {
 }
 
 resource "google_sql_database_instance" "tfe" {
-  name                = local.gsql_database_instance_name
+  name = var.postgres_instance_name
+  # local.gsql_database_instance_name
   region              = var.main_region
   database_version    = var.postgres_settings.version
   deletion_protection = var.postgres_settings.deletion_protection
 
-  master_instance_name = var.postgres_active_instance_name
+  master_instance_name = var.postgres_current_instance_name
 
   settings {
     availability_type = var.postgres_settings.availability_type
@@ -42,7 +45,7 @@ resource "google_sql_database_instance" "tfe" {
     }
 
     dynamic "backup_configuration" {
-      for_each = var.postgres_active_instance_name == null ? [1] : []
+      for_each = var.postgres_current_instance_name == null ? [1] : []
       content {
         enabled                        = true
         start_time                     = var.postgres_settings.backup_start_time
@@ -52,7 +55,7 @@ resource "google_sql_database_instance" "tfe" {
 
     # Do not need to set this for a read replica
     dynamic "maintenance_window" {
-      for_each = var.postgres_active_instance_name == null ? [1] : []
+      for_each = var.postgres_current_instance_name == null ? [1] : []
       content {
         day          = var.postgres_settings.maintenance_window_day
         hour         = var.postgres_settings.maintenance_window_hour
@@ -69,19 +72,20 @@ resource "google_sql_database_instance" "tfe" {
     }
 
     user_labels = merge({
-      name = local.gsql_database_instance_name
+      name = var.postgres_instance_name
+      # local.gsql_database_instance_name
     }, var.common_labels)
   }
 
   provisioner "local-exec" {
     when    = create
-    command = var.postgres_active_instance_name == null ? "gcloud sql databases create ${var.tfe_database.name} --instance=${google_sql_database_instance.tfe.name}" : "echo 'Instance already exists, skipping database creation'"
+    command = var.postgres_current_instance_name == null ? "gcloud sql databases create ${var.tfe_database.name} --instance=${google_sql_database_instance.tfe.name}" : "echo 'Instance already exists, skipping database creation'"
   }
 }
 
-locals {
+# locals {
 
-}
+# }
 
 # gcloud sql databases create {database_name} --instance={instance_name}
 
@@ -91,10 +95,7 @@ locals {
 #   instance = google_sql_database_instance.tfe.name
 # }
 
-data "google_secret_manager_secret_version" "tfe_database_password" {
-  secret     = "tfe-database-password"
-  depends_on = [google_sql_database_instance.tfe] # Created by the bootstrapping module, may not exist on net new
-}
+
 
 # resource "google_sql_user" "tfe" {
 #   for_each = toset(var.postgres_active_instance_name == null ? ["tfe"] : [])

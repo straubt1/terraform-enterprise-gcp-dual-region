@@ -49,11 +49,14 @@ resource "google_service_account" "tfe" {
   description  = "Custom service account for TFE for GCP GKE workload identity."
 }
 
-resource "google_service_account_iam_binding" "tfe_workload_identity" {
-  service_account_id = google_service_account.tfe.id
-  role               = "roles/iam.workloadIdentityUser"
 
-  members = [
-    "serviceAccount:${var.project_id}.svc.id.goog[${var.tfe_kubernetes_namespace}/${var.tfe_kubernetes_namespace}]"
-  ]
-}
+# Moved this to TFE Module
+# resource "google_service_account_iam_binding" "tfe_workload_identity" {
+#   service_account_id = google_service_account.tfe.id
+#   role               = "roles/iam.workloadIdentityUser"
+
+#   members = [
+#     "serviceAccount:${var.project_id}.svc.id.goog[tfe/tfe]"
+#     # "serviceAccount:${var.project_id}.svc.id.goog[${var.tfe_kubernetes_namespace}/${var.tfe_kubernetes_namespace}]"
+#   ]
+# }

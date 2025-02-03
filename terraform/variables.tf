@@ -54,9 +54,9 @@ variable "domain" {
   description = "The domain to use for the TFE installation (ex. company.com)."
 }
 
-variable "tfe_fqdn" {
-  description = "the FQDN for TFE (ex. tfe.company.com)"
-}
+# variable "tfe_fqdn" {
+#   description = "the FQDN for TFE (ex. tfe.company.com)"
+# }
 
 variable "cert_email" {
   description = "The email to use when generating TLS certs"

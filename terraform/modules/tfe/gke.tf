@@ -70,7 +70,7 @@ resource "google_container_node_pool" "control" {
 
   node_config {
     machine_type    = var.gke_node_types.control
-    service_account = var.service_account_email
+    service_account = var.service_account.email
     oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
 
     labels = {
@@ -78,11 +78,11 @@ resource "google_container_node_pool" "control" {
     }
   }
 
-  lifecycle {
-    ignore_changes = [
-      node_config[0].resource_labels["goog-gke-node-pool-provisioning-model"]
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     node_config[0].resource_labels["goog-gke-node-pool-provisioning-model"]
+  #   ]
+  # }
 }
 
 resource "google_container_node_pool" "agents" {
@@ -101,7 +101,7 @@ resource "google_container_node_pool" "agents" {
 
   node_config {
     machine_type    = var.gke_node_types.agent
-    service_account = var.service_account_email
+    service_account = var.service_account.email
     oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
 
     labels = {
@@ -109,9 +109,9 @@ resource "google_container_node_pool" "agents" {
     }
   }
 
-  lifecycle {
-    ignore_changes = [
-      node_config[0].resource_labels["goog-gke-node-pool-provisioning-model"]
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     node_config[0].resource_labels["goog-gke-node-pool-provisioning-model"]
+  #   ]
+  # }
 }

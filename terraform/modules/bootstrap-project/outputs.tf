@@ -3,9 +3,12 @@ output "ssh_public_key" {
   value       = tls_private_key.keypair.public_key_openssh
 }
 
-output "service_account_email" {
+output "service_account" {
   description = "Email address of the service account created for TFE."
-  value       = google_service_account.tfe.email
+  value = {
+    id    = google_service_account.tfe.id
+    email = google_service_account.tfe.email
+  }
 }
 
 output "networking" {

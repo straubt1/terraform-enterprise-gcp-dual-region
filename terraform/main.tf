@@ -6,7 +6,7 @@ locals {
   }
 }
 
-module "bootstrap_project" {
+module "bootstrap" {
   source                   = "./modules/bootstrap-project"
   project_id               = var.project_id
   namespace                = var.namespace
@@ -23,7 +23,7 @@ module "bootstrap_project" {
       local.fqdn.tfe-green
     ]
   }
-  create_cert_files = true
+  create_cert_files = false
   folder_path       = "${path.cwd}/keys"
   tfe_license_file  = var.tfe_license_file
 

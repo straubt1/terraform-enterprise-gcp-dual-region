@@ -42,11 +42,11 @@ variable "tfe_license_file" {
   description = "Location of the TFE License file on disk."
 }
 
-variable "tfe_kubernetes_namespace" {
-  type        = string
-  description = "Kubernetes namespace to deploy TFE into."
-  default     = "tfe"
-}
+# variable "tfe_kubernetes_namespace" {
+#   type        = string
+#   description = "Kubernetes namespace to deploy TFE into."
+#   default     = "tfe"
+# }
 
 variable "create_cert_files" {
   type        = bool

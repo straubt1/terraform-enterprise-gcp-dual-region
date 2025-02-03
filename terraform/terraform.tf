@@ -30,5 +30,5 @@ provider "google" {
 }
 
 provider "acme" {
-  server_url = "https://acme-v02.api.letsencrypt.org/directory" # ACME prod - for your real certs
+  server_url = "https://acme-v02.api.letsencrypt.org/directory"
 }

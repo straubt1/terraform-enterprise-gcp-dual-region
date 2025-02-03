@@ -51,10 +51,14 @@ variable "common_labels" {
   }
 }
 
-variable "service_account_email" {
-  description = "Email of service account to use for TFE."
-  type        = string
+variable "service_account" {
+  description = "Service account to use for TFE."
+  type = object({
+    id    = string
+    email = string
+  })
 }
+
 
 variable "managed_zone_name" {
   description = "Name of managed DNS zone to create records in."
@@ -63,6 +67,12 @@ variable "managed_zone_name" {
 variable "tfe_fqdn" {
   description = "The FQDN for the TFE instance"
   type        = string
+}
+
+variable "tfe_kubernetes_namespace" {
+  type        = string
+  description = "Kubernetes namespace to deploy TFE into."
+  default     = "tfe"
 }
 
 variable "tfe_internal_lb_ip" {
@@ -184,10 +194,16 @@ variable "gcs_active_instance_name" {
   type        = string
   default     = null
 }
-variable "postgres_active_instance_name" {
+
+variable "postgres_instance_name" {
+  description = "Name of the Postgres instance to create."
+  type        = string
+}
+
+variable "postgres_current_instance_name" {
   description = <<-EOT
     Currently active Postgres instance name. 
-    If null, the active instance will be created. 
+    If null, the var.postgres_instance_name instance will be created. 
     Else a read replica will be created.
   EOT
   type        = string
