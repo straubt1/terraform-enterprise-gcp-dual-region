@@ -1,5 +1,4 @@
 locals {
-  # name_prefix = "${var.namespace}-${var.regions.primary}"
   gke_name = "${var.namespace}-gke"
 }
 

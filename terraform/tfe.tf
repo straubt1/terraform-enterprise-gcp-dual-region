@@ -42,7 +42,6 @@ module "tfe-blue" {
   managed_zone_name  = var.managed_zone_name
   tfe_fqdn           = local.fqdn.tfe
   common_labels      = var.common_labels
-  ssh_public_key     = module.bootstrap.ssh_public_key
   vpc_self_link      = module.bootstrap.networking.vpc_self_link
   subnet_self_link   = module.bootstrap.networking.subnet_self_link_blue
   service_account    = module.bootstrap.service_account
@@ -68,7 +67,6 @@ module "tfe-green" {
   managed_zone_name  = var.managed_zone_name
   tfe_fqdn           = local.fqdn.tfe
   common_labels      = var.common_labels
-  ssh_public_key     = module.bootstrap.ssh_public_key
   vpc_self_link      = module.bootstrap.networking.vpc_self_link
   subnet_self_link   = module.bootstrap.networking.subnet_self_link_green
   service_account    = module.bootstrap.service_account

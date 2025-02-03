@@ -1,11 +1,6 @@
-# resource "random_id" "gcs_suffix" {
-#   byte_length = 4
-# }
 locals {
   gcs_bucket_name = "${var.namespace}-gcs"
-  # "${var.namespace}-${random_id.gcs_suffix.hex}-tfe-gcs"
-
-  # GCS is a dual region deployment, we deploy it in blue only
+  # GCS is a dual region deployment, we deploy it in blue module only
   create_gcs_bucket = var.main_region == var.regions.blue
 }
 resource "google_storage_bucket" "tfe" {

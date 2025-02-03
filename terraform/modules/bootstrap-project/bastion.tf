@@ -1,32 +1,40 @@
-# data "google_compute_zones" "available" {}
+data "google_compute_zones" "available" {}
 
-# resource "google_compute_instance" "bastion" {
-#   name         = "${local.name_prefix}-bastion"
-#   zone         = element(data.google_compute_zones.available.names, 0)
-#   machine_type = "e2-micro"
+resource "google_compute_instance" "bastion" {
+  name         = "${var.namespace}-bastion"
+  zone         = element(data.google_compute_zones.available.names, 0)
+  machine_type = "e2-micro"
 
-#   boot_disk {
-#     initialize_params {
-#       image = "ubuntu-os-cloud/ubuntu-minimal-2404-lts-amd64"
-#     }
-#   }
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-minimal-2404-lts-amd64"
+    }
+  }
 
-#   network_interface {
-#     subnetwork = google_compute_subnetwork.subnet.self_link
+  network_interface {
+    # put this in the blue side
+    subnetwork = google_compute_subnetwork.blue.self_link
 
-#     access_config {} # will make public
-#   }
+    access_config {} # will make public
+  }
 
-#   metadata_startup_script = templatefile("${path.module}/templates/bastion_metadata_startup.sh.tpl", {})
+  metadata_startup_script = templatefile("${path.module}/templates/bastion_metadata_startup.sh.tpl", {})
 
-#   metadata = {
-#     ssh-keys = var.ssh_public_key
-#   }
+  metadata = {
+    # just reuse the same ssh key as the one used for the letsencrypt cert
+    ssh-keys = "ubuntu:${tls_private_key.keypair.public_key_openssh}"
+  }
 
-#   tags = ["tfe-bastion"]
+  tags = ["tfe-bastion"]
 
-#   labels = merge({
-#     name = "${local.name_prefix}-bastion" },
-#     var.common_labels
-#   )
-# }
+  labels = merge({
+    name = "${var.namespace}-bastion" },
+    var.common_labels
+  )
+}
+
+resource "local_file" "bastion_ssh_key" {
+  content         = tls_private_key.keypair.private_key_pem
+  file_permission = 600
+  filename        = "${path.cwd}/keys/bastion_ssh_key.pem"
+}

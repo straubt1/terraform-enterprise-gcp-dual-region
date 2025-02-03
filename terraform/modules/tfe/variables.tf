@@ -35,11 +35,6 @@ variable "subnet_self_link" {
   type        = string
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key to add to bastion VM."
-  type        = string
-}
-
 variable "common_labels" {
   description = "Common labels to apply to GCP resources."
   type        = map(string)

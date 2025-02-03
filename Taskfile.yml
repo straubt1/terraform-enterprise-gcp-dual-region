@@ -205,6 +205,12 @@ tasks:
         --namespace $TFE_NAMESPACE \
         --kube-context $GKE_CONTEXT_SECONDARY
 
+  sshuttle:
+    cmds:
+      - |
+        sshuttle -r ${BASTION_CONNECT} 10.0.0.0/16 \
+        --ssh-cmd 'ssh -i terraform/keys/bastion_ssh_key.pem'
+
   tfe-initial-user:
     cmds:
       - |
