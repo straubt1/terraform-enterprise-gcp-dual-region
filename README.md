@@ -26,6 +26,9 @@ Folder Structure:
 - `./secrets/`
   - Place to store a `.env` file with the required secrets for the Taskfile
   - You must create this file and populate it with the required secrets (see Examples directory) if you are using the Taskfile.
+- `./seed/`
+  - Contains the seed data for the TFE deployment
+  - This is optional and VERY much a WIP at the moment, but it might get pulled into it's own repository.
 
 ### Taskfile
 
@@ -38,9 +41,9 @@ task gcp-auth
 ```
 
 > [!NOTE]
-> If you do not wish to use Task, the commands can be referenced easily to see how to run them manually.
+> If you do not wish to use Task, the commands can be referenced easily to see how to run them manually. Refer to the `Taskfile.yml` for the commands and descriptions of what operations they perform.
 
-In order to keep values and secrets out of this repository, you will need to create a `.env` file in the `secrets` directory. This will contain values referenced by the tasks.
+In order to keep values and secrets out of this repository, you will need to create a `.env` file in the `secrets` directory. This will contain values referenced by the tasks and an example can be found at `./examples/.env`. Most of these values are NOT sensitive, but this gives us a single location to store them and easily reuse the Taskfile.
 
 ### k9s
 
@@ -106,6 +109,7 @@ The resources are as follows:
   - PSQL Database
     - Configured as the Active Instance
   - Redis Instance
+    - Standalone Instance in one region
   - Secrets Manage Secret for region specific Redis
   - Internal and External IP Addresses (for both Load Balancer options)
   - Local File for Helm Overrides
@@ -116,6 +120,7 @@ The resources are as follows:
   - PSQL Database
     - Configured as the Read Replica Instance
   - Redis Instance
+    - Standalone Instance in one region
   - Secrets Manage Secret for region specific Redis
   - Internal and External IP Addresses (for both Load Balancer options)
   - Local File for Helm Overrides
@@ -256,6 +261,8 @@ resource "google_service_account_iam_binding" "tfe_workload_identity" {
 
 ## References and Acknowledgements
 
-The Terraform code in this repository is heavily influences by the great work by the contributors of Terraform module for deploying Terraform Enterprise on GCP HVD and can be found [here](https://github.com/hashicorp/terraform-google-terraform-enterprise-gke-hvd).
+The Terraform code in this repository is heavily influences by the great work by the contributors of Terraform module for deploying Terraform Enterprise on GCP HVD.
 
+- [Public Registry Module](https://registry.terraform.io/modules/hashicorp/terraform-enterprise-gke-hvd/google/latest)
+- [TFE HVD Module Repository](https://github.com/hashicorp/terraform-google-terraform-enterprise-gke-hvd)
 - [Hashicorp Helm Chart for TFE](https://github.com/hashicorp/terraform-enterprise-helm)
