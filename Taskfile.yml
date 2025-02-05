@@ -1,12 +1,5 @@
 version: '3'
 
-vars:
-  GKE_CLUSTER_NAME: "tt-us-central1-tfe"
-  GCP_REGION: "us-central1"
-  GCP_PROJECT_ID: "hc-214541fc08ef40958e81fa9c8fa"
-  TFE_NAMESPACE: "tfe"
-  TFE_HOSTNAME: "tfe-us-central1.hc-214541fc08ef40958e81fa9c8fa.gcp.sbx.hashicorpdemo.com"
-
 dotenv: ['.env', 'secrets/.env']
 
 tasks:
@@ -206,12 +199,18 @@ tasks:
         --kube-context $GKE_CONTEXT_SECONDARY
 
   sshuttle:
+    desc: |
+      (Optional) Connect local machine to the private virtual network to route all 10.0.0.0 traffic.
+      This assumes your subnet CIDR's are in that range and is only important if you deploy TFE internally.
+      Install sshuttle https://github.com/sshuttle/sshuttle.
+      BASTION_CONNECT should be in the format "username@ip_address"
     cmds:
       - |
         sshuttle -r ${BASTION_CONNECT} 10.0.0.0/16 \
         --ssh-cmd 'ssh -i terraform/keys/bastion_ssh_key.pem'
 
   tfe-initial-user:
+    desc: Generate a link to allow you to create the very first user in TFE.
     cmds:
       - |
         POD=$(kubectl get pods -n $TFE_NAMESPACE --context=$GKE_CONTEXT_PRIMARY --no-headers -o custom-columns=":metadata.name" | head -n 1)

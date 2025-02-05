@@ -1,3 +1,4 @@
+is_blue_primary   = true #Only updated this if you are following the failover procedure
 namespace         = "my-tfe"
 project_id        = ""
 managed_zone_name = ""
