@@ -1,4 +1,12 @@
+# This is all optional, but it's nice to have a bastion host to ssh into if you 
+# deploy TFE without a public Load Balancer
+# Comment out this if you don't want a bastion host
+
 data "google_compute_zones" "available" {}
+
+resource "tls_private_key" "bastion" {
+  algorithm = "RSA"
+}
 
 resource "google_compute_instance" "bastion" {
   name         = "${var.namespace}-bastion"
@@ -21,8 +29,7 @@ resource "google_compute_instance" "bastion" {
   metadata_startup_script = templatefile("${path.module}/templates/bastion_metadata_startup.sh.tpl", {})
 
   metadata = {
-    # just reuse the same ssh key as the one used for the letsencrypt cert
-    ssh-keys = "ubuntu:${tls_private_key.keypair.public_key_openssh}"
+    ssh-keys = "ubuntu:${tls_private_key.bastion.public_key_openssh}"
   }
 
   tags = ["tfe-bastion"]
@@ -33,8 +40,9 @@ resource "google_compute_instance" "bastion" {
   )
 }
 
+# save the private key to a file so we can use sshuttle
 resource "local_file" "bastion_ssh_key" {
-  content         = tls_private_key.keypair.private_key_pem
+  content         = tls_private_key.bastion.private_key_pem
   file_permission = 600
   filename        = "${path.cwd}/keys/bastion_ssh_key.pem"
 }

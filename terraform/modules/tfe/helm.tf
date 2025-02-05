@@ -4,7 +4,9 @@ locals {
     gcp-service-account = var.service_account.email
     gke-control-pool    = google_container_node_pool.control.name
     gke-agent-pool      = google_container_node_pool.agents.name
-    tfe_lb_ip_name      = google_compute_address.tfe_external_lb.name
+    is_tfe_public       = var.is_tfe_public
+    external_lb_ip_name = google_compute_address.tfe_external_lb.name
+    internal_lb_ip_name = google_compute_address.tfe_internal_lb.name
     tfe_hostname        = var.tfe_fqdn
     database_host       = "${google_sql_database_instance.tfe.private_ip_address}:5432"
     database_name       = var.tfe_database.name

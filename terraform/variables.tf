@@ -3,6 +3,11 @@ variable "project_id" {
   description = "ID of GCP project to create resources in."
 }
 
+variable "is_blue_primary" {
+  type        = bool
+  description = "Boolean to determine if blue is the primary region (should be true during the first terraform run)."
+  default     = true
+}
 variable "regions" {
   description = "Regions to create resources in."
   type = object({

@@ -1,9 +1,3 @@
-# locals {
-#   name_prefix           = var.namespace                               # Resources that are not specific to a region
-#   name_prefix_primary   = "${var.namespace}-${var.regions.primary}"   # Resources in primary region
-#   name_prefix_secondary = "${var.namespace}-${var.regions.secondary}" # Resources in secondary region
-# }
-
 resource "google_compute_network" "vpc" {
   name                            = "${var.namespace}-vpc"
   routing_mode                    = "REGIONAL"

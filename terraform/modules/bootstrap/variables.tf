@@ -60,11 +60,6 @@ variable "folder_path" {
   default     = null
 }
 
-# variable "ssh_public_key" {
-#   description = "SSH public key to add to bastion VM."
-#   type        = string
-# }
-
 variable "cidr_allow_ingress_lb_health_probes" {
   type        = list(string)
   description = "List of GCP source CIDR ranges to allow TCP:443 (HTTPS) inbound to VPC for load balancer health probe traffic. See the [Health checks overview](https://cloud.google.com/load-balancing/docs/health-check-concepts#ip-ranges) doc for more details."

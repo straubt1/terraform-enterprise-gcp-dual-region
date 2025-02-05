@@ -34,6 +34,11 @@ variable "subnet_self_link" {
   description = "Self link of subnet to create resources in."
   type        = string
 }
+variable "is_tfe_public" {
+  description = "Boolean to determine if TFE is public or private."
+  type        = bool
+  default     = true
+}
 
 variable "common_labels" {
   description = "Common labels to apply to GCP resources."

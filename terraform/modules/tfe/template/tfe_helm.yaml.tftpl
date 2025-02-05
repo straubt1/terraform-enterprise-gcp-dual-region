@@ -19,8 +19,13 @@ agentWorkerPodTemplate:
 
 service:
   annotations:
+%{ if is_tfe_public ~}    
     cloud.google.com/l4-rbs: enabled
-    networking.gke.io/load-balancer-ip-addresses: ${tfe_lb_ip_name}
+    networking.gke.io/load-balancer-ip-addresses: ${external_lb_ip_name}
+%{ else ~}
+    networking.gke.io/load-balancer-type: Internal
+    networking.gke.io/load-balancer-ip-addresses: ${internal_lb_ip_name}
+%{ endif ~}
   type: LoadBalancer
   port: 443
 

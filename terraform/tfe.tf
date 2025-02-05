@@ -18,14 +18,12 @@ locals {
     min   = 3
     max   = 3
   }
-}
 
-
-locals {
+  # The following are the calculations for the blue/green deployments, namely the Database instances
   postgres_blue_instance_name  = "${var.namespace}-blue-psql"
   postgres_green_instance_name = "${var.namespace}-green-psql"
 
-  is_blue_primary  = true
+  is_blue_primary  = var.is_blue_primary
   is_green_primary = !local.is_blue_primary
 
   postgres_current_instance_name_for_blue  = local.is_blue_primary ? null : local.postgres_green_instance_name
