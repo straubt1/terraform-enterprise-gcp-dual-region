@@ -14,7 +14,10 @@ output "service_account" {
 output "networking" {
   value = {
     vpc_self_link          = google_compute_network.vpc.self_link
+    vpc_id                 = google_compute_network.vpc.id
     subnet_self_link_blue  = google_compute_subnetwork.blue.self_link
+    subnet_id_blue         = google_compute_subnetwork.blue.id
     subnet_self_link_green = google_compute_subnetwork.green.self_link
+    subnet_id_green        = google_compute_subnetwork.green.id
   }
 }

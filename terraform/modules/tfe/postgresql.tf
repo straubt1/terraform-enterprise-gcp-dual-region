@@ -3,6 +3,9 @@ data "google_secret_manager_secret_version" "tfe_database_password" {
   depends_on = [google_sql_database_instance.tfe] # Created by the bootstrapping module, may not exist on net new
 }
 
+
+
+
 locals {
   # Command to create new database and user, only on FIRST create of the FIRST instance
   db_exec_command = <<-EOT
